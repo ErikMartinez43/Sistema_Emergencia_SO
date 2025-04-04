@@ -1,18 +1,17 @@
 # Sistema de Emergencias - Proyecto de Sistemas Operativos
 
-Este proyecto simula un sistema de atención de emergencias inspirado en el comportamiento de un sistema operativo. Se modelan llamadas de emergencia, unidades de atención (policía, hospital, bomberos), asignación de recursos y comunicación entre procesos concurrentes mediante memoria compartida y semáforos.
+Este proyecto simula un sistema de atención de emergencias. Se modelan llamadas de emergencia, unidades de atención (policía, hospital, bomberos), asignación de recursos y comunicación entre procesos mediante memoria compartida y semáforos.
 
 ---
 
 ## Objetivo
 
-Modelar y simular un sistema distribuido y concurrente en C++ usando técnicas de sistemas operativos:
+Modelar y simular un sistema distribuido en C++:
 - Memoria compartida
 - Semáforos
 - Control de procesos
 - Manejo de recursos y turnos
 - Comunicación entre módulos
-
 ---
 
 ## Distribución del trabajo
