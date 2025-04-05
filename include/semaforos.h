@@ -13,4 +13,4 @@ void liberar_semaforo(int id, int num_semaforo);
 
 void eliminar_semaforo(int id);
 
-#endif;
+#endif
