@@ -22,7 +22,7 @@ int main()
 
     pid_t pid = fork();
 
-    if(pid_t == -1)
+    if(pid == -1)
     {
         perror("Error al hacer fork\n");
         exit(EXIT_FAILURE);
@@ -50,7 +50,7 @@ int main()
         eliminar_memoria(shm_id);
         eliminar_semaforo(sem_id);
 
-        cout << "Recursos limpiados por el proceso padre.\n"
+        cout << "Recursos limpiados por el proceso padre.\n";
     }
 
 
