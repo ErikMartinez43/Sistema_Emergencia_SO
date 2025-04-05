@@ -3,8 +3,8 @@
 #include <unistd.h>
 #include <sys/wait.h>
 
-#include "include/memoria_compartida.h"
-#include "include/semaforos.h"
+#include "memoria_compartida.h"
+#include "semaforos.h"
 
 #define CLAVE_MEMORIA 1234
 #define CLAVE_SEMAFORO 5678
