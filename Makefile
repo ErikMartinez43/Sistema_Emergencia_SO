@@ -7,8 +7,8 @@ BIN = bin
 OBJ = obj 
 
 # Archivos fuente por modulos
-INFRA = $(SRC)/infraestructura/memoria_compartida.cpp $(SRC)/infraestructura/semaforos.cpp
-GENERADOR = $(SRC)/generador_llamadas/generador.cpp $(SRC)/generador_llamadas/flujo_emergencias.cpp
+INFRA = $(SRC)src/infraestructura/memoria_compartida.cpp $(SRC)/infraestructura/semaforos.cpp
+GENERADOR = $(SRC)src/generador_llamadas/generador.cpp $(SRC)/generador_llamadas/flujo_emergencias.cpp
 TEST = $(SRC)src/test/test_integracion.cpp
 HEADERS = include/memoria_compartida.h include/semaforos.h
 
