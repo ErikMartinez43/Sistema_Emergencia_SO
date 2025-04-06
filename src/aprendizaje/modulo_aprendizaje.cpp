@@ -51,14 +51,22 @@ void aprendizaje_recomendar_respuesta(
     //TIPO DE VEHICULO SEGUN TERRENO
     switch (zona->tipo_terreno)
     {
+    case TERRENO_URBANO:
+        *tipo_vehiculo = VEHICULO_SEDAN;
+        break;
+    case TERRENO_RURAL:
+        *tipo_vehiculo = VEHICULO_PICKUP;
+        break;
     case TERRENO_MONTANIOSO:
         *tipo_vehiculo = VEHICULO_TODO_TERRENO;
-
-        
         break;
-    
+    case TERRENO_CONGESTIONADO:
+        *tipo_vehiculo = VEHICULO_MOTO;
+        break;
     default:
+        *tipo_vehiculo = VEHICULO_SEDAN;
         break;
     }
+
 
  }
