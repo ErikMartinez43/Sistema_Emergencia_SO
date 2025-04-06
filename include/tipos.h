@@ -12,6 +12,7 @@
 #define MAX_TURNOS 50
 #define MAX_DETENIDOS 20
 #define MAX_PACIENTES 50
+#define MAX_ZONAS 100
 
 
 //ESTRUCTURA LLAMADAS ACTIVAS
@@ -32,7 +33,7 @@ typedef struct
     int id;
     int tipo; //0:patrulla, 1:Ambulancia, 2:bomberos
     int tipo_terreno;
-    int estado; //1:libre, 0:ocupada
+    int disponible; //1:libre, 0:ocupada
     int zona; //ubicacion geografica
     int prioridad; //nivel de riesgo
 }Unidad;
@@ -98,6 +99,8 @@ typedef struct
 }Paciente;
 
 
+
+
 //ESTRUCTURA GLOBAL
 typedef struct
 {
@@ -108,6 +111,7 @@ typedef struct
     Turno turnos[MAX_TURNOS];
     Detenido detenidos[MAX_DETENIDOS];
     Paciente pacientes[MAX_PACIENTES];
+    ZonaRiesgo zonas[MAX_ZONAS];
 
 }MemoriaCompartida;
 
