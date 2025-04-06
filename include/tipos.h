@@ -19,6 +19,7 @@ typedef struct
 {
     int id; //identificador de llamdas
     int tipo;
+    int tipo_terreno;
     int estado;
     int zona; //codigo de zona geografica
     int unidad_asignada; //id de unidad asignada
@@ -30,10 +31,21 @@ typedef struct
 {
     int id;
     int tipo; //0:patrulla, 1:Ambulancia, 2:bomberos
+    int tipo_terreno;
     int estado; //1:libre, 0:ocupada
     int zona; //ubicacion geografica
     int prioridad; //nivel de riesgo
 }Unidad;
+
+typedef struct
+{
+    int codigo_zona; //codigo unico de la colonia o sector
+    char nombre[50]; //nombre colonia, barrio o sector
+    int zona_general;
+    int actividad_criminal;
+    int nivel_riesgo;
+}ZonaRiesgo;
+
 
 //ESTRUCTURA ASIGNACION DE INDENTES
 typedef struct
@@ -49,6 +61,7 @@ typedef struct
 {
  int zona
  int tipo_incidente; //0:robo, 1:herida, etc..
+ int tipo_terreno;
  int conteo;
  time_t ultimo_registro;
 }RegistroAprendizaje;
