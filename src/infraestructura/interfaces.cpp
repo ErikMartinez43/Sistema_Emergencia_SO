@@ -119,7 +119,7 @@ const char *obtener_tipo_unida(int tipo_unidad)
 {
     switch (tipo_unidad)
     {
-    case UNIDA_PATRULLA: return "Patrulla";
+    case UNIDAD_PATRULLA: return "Patrulla";
     case UNIDAD_AMBULANCIA: return "Ambulancia";
     case UNIDAD_BOMBEROS: return "Bomberos";
     default: return "desconocido";
