@@ -45,6 +45,7 @@ typedef struct
     int zona_general;
     int actividad_criminal;
     int nivel_riesgo;
+    int tipo_terreno; //URBARNO, RURAL, MONTANIOS, CONGESTIONADO
 }ZonaRiesgo;
 
 
