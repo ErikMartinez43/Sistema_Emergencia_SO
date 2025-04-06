@@ -68,5 +68,9 @@ void aprendizaje_recomendar_respuesta(
         break;
     }
 
+    if(zona->nivel_riesgo == RIESGO_ALTO && tipo_vehiculo == VEHICULO_SEDAN)
+    {
+        *tipo_vehiculo = VEHICULO_PICKUP;
+    }
 
  }
