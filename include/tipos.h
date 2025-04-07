@@ -3,7 +3,7 @@
 #define TIPOS_H
 
 #include <sys/types.h>
-#include <time>
+#include <time.h>
 
 #define MAX_LLAMADAS 50
 #define MAX_UNIDADES 30
@@ -61,7 +61,7 @@ typedef struct
 //ESTRUCTURA: HISTORIAL/APRENDIZAJE
 typedef struct
 {
- int zona
+ int zona;
  int tipo_incidente; //0:robo, 1:herida, etc..
  int tipo_terreno;
  int conteo;

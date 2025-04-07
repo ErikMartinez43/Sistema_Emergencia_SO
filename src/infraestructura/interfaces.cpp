@@ -4,7 +4,7 @@
 
 //LLAMADAS
 
-Llamada *obtener_llamada_disponible(MemoriaCompartida *mem)
+Llamada* obtener_llamada_disponible(MemoriaCompartida *mem)
 {
     for(int i = 0; i < MAX_LLAMADAS; ++i)//recorre el arreglo de llamadas en memoria compartida
     {
@@ -27,7 +27,7 @@ void finalizar_llamada(Llamada* llamada)
 
 //UNIDADES
 
-Unidad* buscar_unidad_disponible(MemoriaCompartida *mem, int tipo)
+Unidad* buscar_unidad_disponible(MemoriaCompartida* mem, int tipo)
 {
     for(int i = 0; i < MAX_UNIDADES; ++i)
     {
@@ -39,7 +39,7 @@ Unidad* buscar_unidad_disponible(MemoriaCompartida *mem, int tipo)
     return NULL;
 }
 
-void asignar_unidad(Unidad *unidad, int llamada_id)
+void asignar_unidad(Unidad* unidad, int llamada_id)
 {
     if(unidad != NULL)
     {
@@ -86,7 +86,7 @@ const char* obtener_nombre_riesgo(int nivel)
     }
 }
 
-const char *obtener_tipo_llamada(int tipo)
+const char* obtener_tipo_llamada(int tipo)
 {
     switch (tipo)
     {
@@ -101,7 +101,7 @@ const char *obtener_tipo_llamada(int tipo)
     };
 }
 
-const char *obtener_actividad_criminal(int actividad)
+const char* obtener_actividad_criminal(int actividad)
 {
     switch (actividad)
     {
@@ -115,7 +115,7 @@ const char *obtener_actividad_criminal(int actividad)
     }
 }
 
-const char *obtener_tipo_unida(int tipo_unidad)
+const char* obtener_tipo_unidad(int tipo_unidad)
 {
     switch (tipo_unidad)
     {

@@ -18,7 +18,7 @@ int crear_clave_memoria(key_t clave, size_t tamaño)
     return id;
 }
 
-void* get_memoria(int id)
+void* obtener_memoria(int id)
 {
     void* ptr = shmat(id, NULL, 0);
     if (ptr == (void*)-1)

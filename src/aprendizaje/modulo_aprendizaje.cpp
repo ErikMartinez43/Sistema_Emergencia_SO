@@ -4,10 +4,10 @@
 
 void aprendizaje_recomendar_respuesta(
     MemoriaCompartida* mem,
-    int codigo_zona;
-    int tipo_llamada;
-    int* tipo_unidad;
-    int* tipo_vehiculo;
+    int codigo_zona,
+    int tipo_llamada,
+    int* tipo_unidad,
+    int* tipo_vehiculo
  )
  {
     if( !mem || !tipo_unidad || !tipo_vehiculo) return;
@@ -34,7 +34,7 @@ void aprendizaje_recomendar_respuesta(
     case LLAMADA_COMBINADA_MB:
         *tipo_unidad = UNIDAD_AMBULANCIA; //DEBERA REALIZAR SOLICITUD DE REFUERZOS
         break;
-    case LLAMADA_COMBINADA_MP
+    case LLAMADA_COMBINADA_MP:
         *tipo_unidad = UNIDAD_AMBULANCIA;//protocolo de refuerzos
         break;
     case LLAMADA_COMBINADA_Pb:

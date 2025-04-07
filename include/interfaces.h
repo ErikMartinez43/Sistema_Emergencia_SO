@@ -73,7 +73,7 @@ const char* obtener_actividad_criminal(int actividad);
 /**
  * devuelve un string que describe el tipo de unidad
  */
-const char* obtener_tipo_unida(int tipo_unidad);
+const char* obtener_tipo_unidad(int tipo_unidad);
 /**
  * devuelve descripcion de gravedad del paciente
  */
