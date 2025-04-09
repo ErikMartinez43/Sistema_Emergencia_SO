@@ -48,7 +48,7 @@ MemoriaCompartida* obtener_memoria(GestionMemoria* gm);
  * @param id Identificador unico
  * @return Clave generada o -1 en erro
  */
-key_t generar_clave(const char* ruta, int id);
+static key_t generar_clave(const char* ruta, int id);
 
 //funciones avanzadas para manejo seguro
 int bloquear_memoria(GestionMemoria* gm);
