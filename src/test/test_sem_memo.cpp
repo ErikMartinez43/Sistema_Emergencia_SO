@@ -6,7 +6,6 @@
  * @brief Verifica el estado actual del sistema de emergencias
  * 
  * Imprime los contadores de memoria compartida y el valor de los semáforos
- * relacionados. Ideal para debugging o validación después de eventos.
  */
 void verificar_estado_sistema(GestionMemoria *gm, GestionSemaforos *gs)
 {
@@ -51,7 +50,7 @@ int main()
     GestionMemoria gm = crear_memoria_compartida(clave, sizeof(MemoriaCompartida));
     GestionSemaforos gs = crear_conjunto_semaforos(clave, 8); // por ejemplo
 
-    // Inicializás los semáforos si sos el creador
+    // Inicializa los semáforos 
     if (gs.creado)
     {
         for (int i = 0; i < gs.num_semaforos; i++)
@@ -63,7 +62,7 @@ int main()
     // Llamás a tu verificación
     verificar_estado_sistema(&gm, &gs);
 
-    // Cleanup (opcional según tu lógica de pruebas)
+    // limpiar
     destruir_memoria_compartida(&gm);
     eliminar_conjunto_semaforos(&gs);
 
