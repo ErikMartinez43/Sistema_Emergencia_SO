@@ -1,138 +1,138 @@
 #include "interfaces.h"
 #include <string.h>
-#include <stdio.h>
 
-//LLAMADAS
+//====== FUNCIONES SOBRE LLAMADAS =======
 
-Llamada* obtener_llamada_disponible(MemoriaCompartida *mem)
+Llamada *obtener_llamada_disponible(MemoriaCompartida *mem)
 {
-    for(int i = 0; i < MAX_LLAMADAS; ++i)//recorre el arreglo de llamadas en memoria compartida
+    for(int i = 0; i < mem->contador_llamadas; ++i)
     {
-        if(mem->llamadas[i].estado == LLAMADA_PENDIENTE) //Busca la primera llamada en el arreglo en el arreglo de llamadas
+        if(mem->llamadas[i].estado == LLAMADA_PENDIENTE)
         {
-            return &mem->llamadas[i];//retorna un puntero a la primera llamada encontrada
-        }
-    }
-    return NULL;//devuelve null si no hay llamadas pendientes
-}
-
-//CAMBIA EL ESTADO DE UNA LLAMADA A FINALIZADA
-void finalizar_llamada(Llamada* llamada)
-{
-    if(llamada != NULL)//verifica que el puntero no sea nulo antes de modificar
-    {
-        llamada->estado = LLAMADA_FINALIZADA;
-    }
-}
-
-//UNIDADES
-
-Unidad* buscar_unidad_disponible(MemoriaCompartida* mem, int tipo)
-{
-    for(int i = 0; i < MAX_UNIDADES; ++i)
-    {
-        if(mem->unidades[i].tipo == tipo && mem->unidades[i].disponible == 1)//verifica el tipo de unidad (patrulla, ambulancia, etc.) y el estado de la misma(libre, ocupada)
-        {
-            return &mem->unidades[i];//devuelve un puntero a la primera que cumpla esas dos condiciones
+            return &mem->llamadas[i];
         }
     }
     return NULL;
 }
 
-void asignar_unidad(Unidad* unidad, int llamada_id)
+void finalizar_llamada(Llamada *llamada)
 {
-    if(unidad != NULL)
+    if(llamada)
     {
-        unidad->disponible = 0; //marca la unidad como ocupada
-        printf("Unidad %d asignada a llamadas %d\n", unidad->id, llamada_id); //imprime mensaje de unidad asignada al id de llamada
+        llamada->estado = LLAMADA_FINALIZADA;
+        llamada->tiempos.resolucion = time(NULL);
     }
 }
 
-//ZONAS DE RIESGO
-int zona_riesgosa(MemoriaCompartida* mem, int codigo_zona)
+//========= FUNCIONES SOBRE UNIDADES ==================
+Unidad *buscar_unidad_disponible(MemoriaCompartida *mem, TipoUnidad tipo)
 {
-    for(int i = 0; i < 100; ++i)//recorre el arreglo zonas en memoria
+    for(int i = 0; i < mem->contador_unidades; ++i)
     {
-        if(mem->zonas[i].codigo_zona == codigo_zona)//compara codigo por zona
+        if(mem->unidades[i].estado == UNIDAD_DISPONIBLE && mem->unidades[i].tipo == tipo)
         {
-            return mem->zonas[i].nivel_riesgo == RIESGO_ALTO; //retorna 1 si el nivel de riesgo es alto o si no encuentra la zona
+            return &mem->unidades[i];
+        }
+    }
+    return NULL;
+}
+
+void asignar_unidad(Unidad *unidad, int llamada_id)
+{
+    if(unidad)
+    {
+        unidad->estado = UNIDAD_OCUPADA;
+        unidad->prioridad = RIESGO_MEDIO;
+    }
+}
+
+//======= FUNCIONES SOBRE UBICACION
+int zona_riesgosa(MemoriaCompartida *mem, int codigo_zona)
+{
+    for(int i = 0; i < mem->contador_zonas; ++i)
+    {
+        if(mem->zonas[i].codigo_zona == codigo_zona)
+        {
+            return mem->zonas[i].nivel_riesgo >= RIESGO_ALTO;
         }
     }
     return 0;
 }
 
-ZonaRiesgo* obtener_codigo_zona(MemoriaCompartida* mem, int codigo_zona)
+ZonaRiesgo *obtener_codigo_zona(MemoriaCompartida *mem, int codigo_zona)
 {
-    for(int i = 0; i < 100; ++i)
+    for(int i = 0; i < mem->contador_zonas; ++i)
     {
         if(mem->zonas[i].codigo_zona == codigo_zona)
         {
-            return &mem->zonas[i]; //retorna un puntero a la estrcutura zona de riesgo
-                                    //que tenga este codigo
+            return &mem->zonas[i];
         }
     }
-    return NULL;//devuelve null si no la encuentra
+    return NULL;
 }
 
-//FUNCIONES AUXILIARES DE DESCRIPCION
-const char* obtener_nombre_riesgo(int nivel)
+//=========FUNCIONES AUXILIARES=============================
+const char *obtener_nombre_riesgo(NivelRiesgo nivel)
 {
     switch (nivel)
     {
     case RIESGO_BAJO: return "Bajo";
     case RIESGO_MEDIO: return "Medio";
     case RIESGO_ALTO: return "Alto";
-    default: return "desconocido";
+    case RIESGO_CRITICO: return "Critico"
+    default: return "Desconocido";
     }
 }
 
-const char* obtener_tipo_llamada(int tipo)
+const char *obtener_tipo_llamada(TipoLlamada tipo)
 {
     switch (tipo)
     {
-    case LLAMADA_MEDICA: return "medica";
-    case LLAMADA_POLICIAL: return "policial";
-    case LLAMADA_INCENDIO: return "incendio";
-    case LLAMADA_COMBINADA_MP: return "medica + policial";
-    case LLAMADA_COMBINADA_MB: return "medica + bomberos";
-    case LLAMADA_COMBINADA_Pb: return "Policial + bomberos";
-    case LLAMADA_TOTAL: return "Todas las unidades";
-    default: return "Desconocido";
-    };
+    case LLAMADA_MEDICA: return "Medica";
+    case LLAMADA_POLICIAL: return "Policial";
+    case LLAMADA_INCENDIO: return "Incendio";
+    case LLAMADA_COMBINADA_MP: return "Médica + Policial";
+    case LLAMADA_COMBINADA_MB: return "Médica + Bomberos";
+    case LLAMADA_COMBINADA_PB: return "Policial + Bomberos";
+    case LLAMADA_TOTAL: return "Total (Médica + Policial + Bomberos)";
+    default: return "Desconocida";
+    }
 }
 
-const char* obtener_actividad_criminal(int actividad)
+const char *obtener_actividad_criminal(ActividadCriminal actividad)
 {
     switch (actividad)
     {
+        case ACTIVIDAD_NONE: return "Sin actividad";
         case ACTIVIDAD_CRIMEN_ORGANIZADO: return "Crimen organizado";
-        case ACTIVIDAD_TRAFICO_PERSONAS: return "Trafico de persona";
+        case ACTIVIDAD_TRAFICO_PERSONAS: return "Tráfico de personas";
         case ACTIVIDAD_VENTA_DROGA: return "Venta de droga";
         case ACTIVIDAD_SICARIATO: return "Sicariato";
-        case ACTIVIDAD_EXTORSION: return "Extorsion";
-        default: return "Ninguna";
-   
+        case ACTIVIDAD_EXTORSION: return "Extorsión";
+        case ACTIVIDAD_PANDILLAS: return "Pandillas";
+        default: return "Desconocida";
     }
 }
 
-const char* obtener_tipo_unidad(int tipo_unidad)
+const char *obtener_tipo_unidad(TipoUnidad tipo_unidad)
 {
     switch (tipo_unidad)
     {
-    case UNIDAD_PATRULLA: return "Patrulla";
-    case UNIDAD_AMBULANCIA: return "Ambulancia";
-    case UNIDAD_BOMBEROS: return "Bomberos";
-    default: return "desconocido";
-    }
+        case UNIDAD_PATRULLA: return "Patrulla";
+        case UNIDAD_AMBULANCIA: return "Ambulancia";
+        case UNIDAD_BOMBEROS: return "Bomberos";
+        case UNIDAD_COMBINADA: return "Combinada";
+        default: return "Desconocida";
+    }   
 }
 
-const char *obtener_gravedad(int gravedad)
+const char *obtener_gravedad(GravedadPaciente gravedad)
 {
     switch (gravedad)
     {
-    case GRAVEDA_LEVE: return "Leve";
-    case GRAVEDAD_MODERADA: return "Moderada";
-    case GRAVEDAD_GRAVE: return "Grave";
-    default: return "Desconocida";
-    }
+        case GRAVEDAD_LEVE: return "Leve";
+        case GRAVEDAD_MODERADA: return "Moderada";
+        case GRAVEDAD_GRAVE: return "Grave";
+        default: return "Desconocida";
+    } 
 }

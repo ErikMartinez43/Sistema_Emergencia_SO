@@ -1,11 +1,12 @@
 #ifndef INTERFACES_H
-#define INTERFACE_H
+#define INTERFACES_H
 
 #include "tipos.h"
 #include "estados.h"
-/*
-    INTERFACES GENERALES ENTRE MODULOS DEL SISTEMA
-*/
+/**
+ * INTERFACES GENERALES ENTRE MODULOS DEL SISTEMA
+ */
+
 //FUNCIONES SOBRE LLAMADAS
 /*
     *Busca una llamada en estado pendiente dentro de la memoria
@@ -29,7 +30,7 @@ void finalizar_llamada(Llamada* llamada);
  * parametro tipo, tipo de unidad(PATRULLA, AMBULANCIA, BOMBEROS)
  * retorna un puntero a la unidad libre o null si no la hay
  */
-Unidad* buscar_unidad_disponible(MemoriaCompartida* mem, int tipo);
+Unidad* buscar_unidad_disponible(MemoriaCompartida* mem, TipoUnidad tipo);
 /**
  * Asigna una unidad a una llamada especifica
  * parametro unidad, puntero a la unidad
@@ -61,22 +62,22 @@ ZonaRiesgo* obtener_codigo_zona(MemoriaCompartida* mem, int codigo_zona);
  * retorna una cadena string con la descripcion del nivel de riesgo
  */
 
-const char* obtener_nombre_riesgo(int nivel);
+const char* obtener_nombre_riesgo(NivelRiesgo nivel);
 /**
  * retorna una cadena que describe el tipo de llamada
  */
-const char* obtener_tipo_llamada(int tipo);
+const char* obtener_tipo_llamada(TipoLlamada tipo);
 /**
  * retorna un string que describe actividad criminal
  */
-const char* obtener_actividad_criminal(int actividad);
+const char* obtener_actividad_criminal(ActividadCriminal actividad);
 /**
  * devuelve un string que describe el tipo de unidad
  */
-const char* obtener_tipo_unidad(int tipo_unidad);
+const char* obtener_tipo_unidad(TipoUnidad tipo_unidad);
 /**
  * devuelve descripcion de gravedad del paciente
  */
-const char* obtener_gravedad(int gravedad);
+const char* obtener_gravedad(GravedadPaciente gravedad);
 
-#endif
+#endif //INTERFACES_H
