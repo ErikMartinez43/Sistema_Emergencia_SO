@@ -1,5 +1,5 @@
 #ifndef SEMAFOROS_H
-#define SEMAFORS_H
+#define SEMAFOROS_H
 
 #include <sys/ipc.h>
 #include <sys/sem.h>
@@ -8,13 +8,16 @@
 #define MAX_SEMAFOROS 20    //maximo numero de semaforos por conjunto
 #define PERMISOS_SEM 0644 // Escritura y lectura solo para el usuario
 
-//union necesarioa para operaciones semctl, 
-typedef union
+//union necesaria para operaciones semctl,
+#ifndef _SEMUN_DEFINED
+#define _SEMUN_DEFINED
+union
 {
     int val;
     struct semid_ds *buf;
     unsigned short *array;
 }semun;
+#endif
 
 //estructura para manejo seguro de semaforos
 typedef struct
@@ -64,5 +67,13 @@ bool liberar_semaforo(GestionSemaforos *gs, int num_semaforo);
  * @note solo tiene efecto sie le proceso fue el creador
  */
  void eliminar_conjunto_semaforos(GestionSemaforos *gs);
- 
+
+ /**
+ * @brief Obtiene el valor actual de un semáforo
+ * @param gs Estructura de gestión de semáforos
+ * @param num_semaforo Índice del semáforo
+ * @return valor actual, o -1 en caso de error
+ */
+int obtener_valor_semaforo(GestionSemaforos *gs, int num_semaforo);
+
 #endif

@@ -1,29 +1,72 @@
+#include "memoria_compartida.h"
 #include "semaforos.h"
+#include <stdio.h>
 
-int main(){
-    //Crear conjunto de semaforos
-    key_t clave = ftok("/tmp", 'S');
-    GestionSemaforos gs = crear_conjunto_semaforos(clave, 3);
-    
-    if(gs.sem_id == -1)
+/**
+ * @brief Verifica el estado actual del sistema de emergencias
+ * 
+ * Imprime los contadores de memoria compartida y el valor de los semáforos
+ * relacionados. Ideal para debugging o validación después de eventos.
+ */
+void verificar_estado_sistema(GestionMemoria *gm, GestionSemaforos *gs)
+{
+    if (!gm || !gm->ptr_memoria)
     {
-        return 1;
+        fprintf(stderr, "[Error] Memoria compartida no inicializada.\n");
+        return;
     }
 
-    //incializar semaforo
-    if(gs.creado)
+    printf("\n==== ESTADO DE LA MEMORIA COMPARTIDA ====\n");
+    printf("Llamadas activas: %d\n", gm->ptr_memoria->contador_llamadas);
+    printf("Unidades registradas: %d\n", gm->ptr_memoria->contador_unidades);
+    printf("Incidentes activos: %d\n", gm->ptr_memoria->contador_incidentes);
+    printf("Historial de aprendizaje: %d\n", gm->ptr_memoria->contador_historial);
+    printf("Turnos asignados: %d\n", gm->ptr_memoria->contador_turnos);
+    printf("Detenidos registrados: %d\n", gm->ptr_memoria->contador_detenidos);
+    printf("Pacientes registrados: %d\n", gm->ptr_memoria->contador_pacientes);
+    printf("Zonas de riesgo definidas: %d\n", gm->ptr_memoria->contador_zonas);
+
+    if (!gs || gs->sem_id == -1)
     {
-        inicializar_semaforo(&gs, 0, 1); //semaforo binario
-        inicializar_semaforo(&gs, 1, 5); //semaforo contador
+        fprintf(stderr, "[Advertencia] Conjunto de semáforos no disponible.\n");
+        return;
     }
 
-    //uso tipico
-    if(tomar_semaforo(&gs, 0, 1000)) //timeout de 1 s
-    {   //seccion critica
-        liberar_semaforo(&gs, 0);
+    printf("\n==== ESTADO DE LOS SEMÁFOROS ====\n");
+    for (int i = 0; i < gs->num_semaforos; ++i)
+    {
+        int val = obtener_valor_semaforo(gs, i);
+        if (val != -1)
+        {
+            printf("Semáforo [%d] → Valor actual: %d\n", i, val);
+        }
     }
 
-    //limpieza
+    printf("=====================================\n\n");
+}
+
+int main()
+{
+    key_t clave = 0x1234;
+    GestionMemoria gm = crear_memoria_compartida(clave, sizeof(MemoriaCompartida));
+    GestionSemaforos gs = crear_conjunto_semaforos(clave, 8); // por ejemplo
+
+    // Inicializás los semáforos si sos el creador
+    if (gs.creado)
+    {
+        for (int i = 0; i < gs.num_semaforos; i++)
+        {
+            inicializar_semaforo(&gs, i, 1);
+        }
+    }
+
+    // Llamás a tu verificación
+    verificar_estado_sistema(&gm, &gs);
+
+    // Cleanup (opcional según tu lógica de pruebas)
+    destruir_memoria_compartida(&gm);
     eliminar_conjunto_semaforos(&gs);
+
     return 0;
 }
+

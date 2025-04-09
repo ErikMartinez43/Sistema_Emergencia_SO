@@ -1,4 +1,5 @@
 #include "memoria_compartida.h"
+#include "estados.h"
 
 #include <sys/ipc.h>
 #include <sys/shm.h>
@@ -44,7 +45,7 @@ GestionMemoria crear_memoria_compartida(key_t clave, size_t tamanio)
 
         if(intento == MAX_INTENTOS -1)
         {
-            fprintf(stderr, "Error: no se puedo crear/adjuntar memoria despues de %d intentos\n");
+            fprintf(stderr, "Error: no se puedo crear/adjuntar memoria despues de %d intentos\n", MAX_INTENTOS);
             return gm;
         }
         sleep(TIEMPO_ESPERA);
@@ -87,8 +88,8 @@ void destruir_memoria_compartida(GestionMemoria *gm)
         }
     }
 
-    gm->shm_id -1;
-    gm->ptr_memoria;
+    gm->shm_id = -1;
+    gm->ptr_memoria = NULL;
     gm->creado = false;
 }
 
@@ -102,7 +103,7 @@ MemoriaCompartida *obtener_memoria(GestionMemoria *gm)
     return gm->ptr_memoria;
 }
 
-static key_t generar_clave(const char *ruta, int id)
+key_t generar_clave(const char *ruta, int id)
 {
     if (!ruta)
     {
@@ -134,7 +135,7 @@ int bloquear_memoria(GestionMemoria *gm)
 
 int liberar_memoria(GestionMemoria *gm)
 {
-    if(!gm || gm->ptr_memoria)
+    if(!gm || !gm->ptr_memoria)
     {
         fprintf(stderr, "Error: Memoria no valida para liberacion\n");
         return -1;

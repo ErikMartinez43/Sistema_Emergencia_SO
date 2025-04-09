@@ -1,61 +1,61 @@
 #ifndef ESTADOS_H
 #define ESTADOS_H
 
-//ESTADO GRAVEDAD DEL PACIENTE
+// ESTADO DE GRAVEDAD DEL PACIENTE
 typedef enum 
 {
-    GRAVEDA_LEVE = 0,
+    GRAVEDAD_LEVE = 0,
     GRAVEDAD_MODERADA = 1,
     GRAVEDAD_GRAVE = 2
-}GravedadPaciente;
+} GravedadPaciente;
 
-//ESTADOS DE LA UNIDAD
+// ESTADOS DE LA UNIDAD
 typedef enum 
 {
     UNIDAD_OCUPADA = 0,
     UNIDAD_DISPONIBLE = 1,
-    UNIDAD_DESCANCSANDO = 2
-}EstadoUnidad;
+    UNIDAD_DESCANSANDO = 2
+} EstadoUnidad;
 
-//ESTADOS DE LA LLAMADA
+// ESTADOS DE LA LLAMADA
 typedef enum 
 {
     LLAMADA_PENDIENTE = 0,
     LLAMADA_EN_ATENCION = 1,
     LLAMADA_FINALIZADA = 2
-}EstadoLlamada;
+} EstadoLlamada;
 
-//ESTADO DE INCIDENTE
+// ESTADO DE INCIDENTE
 typedef enum 
 {
     INCIDENTE_EN_CAMINO = 0,
     INCIDENTE_EN_LUGAR = 1,
-    INCIDENTE_TRASLADADO = 2,
+    INCIDENTE_TRASLADO = 2,
     INCIDENTE_CERRADO = 3
-}EstadoIncidente;
+} EstadoIncidente;
 
-//ESTADOS DEL TURNO
+// ESTADOS DEL TURNO
 typedef enum
 {
     TURNO_ACTIVO = 0,
     TURNO_DESCANSO = 1,
     TURNO_FUERA_SERVICIO = 2
-}EstadoTurno;
+} EstadoTurno;
 
-//ESTADOS DEL DETENIDO
+// ESTADOS DEL DETENIDO
 typedef enum 
 {
     DETENIDO_EN_CUSTODIA = 0,
     DETENIDO_TRASLADADO = 1,
     DETENIDO_LIBERADO = 2
-}EstadoDetenido;
+} EstadoDetenido;
 
-//ESTADO DEL PACIENTE
+// ESTADO DEL PACIENTE
 typedef enum
 {
     PACIENTE_ESPERANDO = 0,
     PACIENTE_EN_RUTA = 1,
-    PACIENTE_HOSPITAL = 2
-}EstadoPaciente;
+    PACIENTE_EN_HOSPITAL = 2
+} EstadoPaciente;
 
 #endif

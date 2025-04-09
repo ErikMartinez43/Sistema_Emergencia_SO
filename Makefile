@@ -1,39 +1,43 @@
-# Compilador y banderas
+# Compilador y flags
 CXX = g++
-CXXFLAGS = -Wall -std=c++11
-INCLUDES = -Iinclude
-SRC = src
-BIN = bin
+CXXFLAGS = -Wall -Wextra -std=c++17 -g
 
-# Archivos fuente
-INFRA = $(SRC)/infraestructura/memoria_compartida.cpp $(SRC)/infraestructura/semaforos.cpp
-TEST = $(SRC)/test/test_integracion.cpp
+# Directorios
+SRC_DIR = src
+TEST_DIR = src/test
+INFRA_DIR = src/infraestructura
+BUILD_DIR = build
+INCLUDE_DIR = include
 
-# Regla para compilar el test
-test:
-	@mkdir -p $(BIN)
-	$(CXX) $(CXXFLAGS) $(TEST) $(INFRA) $(INCLUDES) -o $(BIN)/test_integracion
-	@echo "Compilado: test_integracion"
+# Archivos fuente y objetos
+OBJS = \
+	$(BUILD_DIR)/memoria_compartida.o \
+	$(BUILD_DIR)/semaforos.o \
+	$(BUILD_DIR)/test_integracion.o
 
-# Limpiar binarios
-limpiar:
-	rm -rf $(BIN)/*
-	@echo "Proyecto limpio."
+# Ejecutable
+TARGET = test_integracion
 
-TEST_APRENDIZAJE = src/test/test_aprendizaje.cpp
+# Regla por defecto
+all: $(TARGET)
 
-test_aprendizaje:
-	$(CXX) $(CXXFLAGS) $(TEST_APRENDIZAJE) src/infraestructura/memoria_compartida.cpp \
-    src/infraestructura/semaforos.cpp src/infraestructura/interfaces.cpp \
-    src/aprendizaje/modulo_aprendizaje.cpp -Iinclude -o bin/test_aprendizaje
+# Vinculación final
+$(TARGET): $(OBJS)
+	$(CXX) $(CXXFLAGS) -o $@ $^
 
-TEST_INTEGRACION = src/test/test_integracion.cpp
+# Compilación de objetos
+$(BUILD_DIR)/memoria_compartida.o: $(INFRA_DIR)/memoria_compartida.cpp $(INCLUDE_DIR)/memoria_compartida.h $(INCLUDE_DIR)/tipos.h
+	$(CXX) $(CXXFLAGS) -I$(INCLUDE_DIR) -c $< -o $@
 
-test_integracion:
-	$(CXX) $(CXXFLAGS) $(TEST_INTEGRACION) src/infraestructura/memoria_compartida.cpp \
-	src/infraestructura/semaforos.cpp src/infraestructura/interfaces.cpp \
-	src/aprendizaje/modulo_aprendizaje.cpp -Iinclude -o bin/test_integracion
+$(BUILD_DIR)/semaforos.o: $(INFRA_DIR)/semaforos.cpp $(INCLUDE_DIR)/semaforos.h
+	$(CXX) $(CXXFLAGS) -I$(INCLUDE_DIR) -c $< -o $@
 
+$(BUILD_DIR)/test_integracion.o: $(TEST_DIR)/test_integracion.cpp $(INCLUDE_DIR)/memoria_compartida.h $(INCLUDE_DIR)/semaforos.h
+	$(CXX) $(CXXFLAGS) -I$(INCLUDE_DIR) -c $< -o $@
 
-	
-.PHONY: test limpiar
+# Limpieza
+clean:
+	rm -f $(BUILD_DIR)/*.o $(TARGET)
+
+# Carpeta build si no existe
+$(shell mkdir -p $(BUILD_DIR))

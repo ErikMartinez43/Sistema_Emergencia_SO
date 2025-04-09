@@ -37,7 +37,7 @@ void destruir_memoria_compartida(GestionMemoria* gm);
 
 /**
  * @brief Obtiene puntero a la memoria compartida
- * @param gm Obejto GestionMemoria
+ * @param gm Objeto GestionMemoria
  * @return puntero a la memoria compartida o NULL en error
  */
 MemoriaCompartida* obtener_memoria(GestionMemoria* gm);
@@ -46,9 +46,9 @@ MemoriaCompartida* obtener_memoria(GestionMemoria* gm);
  * @brief Genera una clave unica para memoria compartida
  * @param ruta Ruta base para generacion de clave
  * @param id Identificador unico
- * @return Clave generada o -1 en erro
+ * @return Clave generada o -1 en error
  */
-static key_t generar_clave(const char* ruta, int id);
+key_t generar_clave(const char* ruta, int id);
 
 //funciones avanzadas para manejo seguro
 int bloquear_memoria(GestionMemoria* gm);

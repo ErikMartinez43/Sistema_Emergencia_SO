@@ -9,6 +9,14 @@
 #include <time.h>
 #include <stdio.h>
 
+#if defined (__linux__)
+typedef union {
+    int val;
+    struct semid_ds *buf;
+    unsigned short *array;
+}semun;
+#endif
+
 //Operacion semop con timeout
 static int semop_timeout(int semid, struct sembuf *sops, size_t nsops, int timeout_ms)
 {
@@ -20,7 +28,7 @@ static int semop_timeout(int semid, struct sembuf *sops, size_t nsops, int timeo
     struct timespec ts;
     clock_gettime(CLOCK_REALTIME, &ts);
     ts.tv_sec += timeout_ms / 1000;
-    ts.tv_nsec += (timeout_ms % 1000) * 1000000
+    ts.tv_nsec += (timeout_ms % 1000) * 1000000;
 
     return semtimedop(semid, sops, nsops, &ts);
 }
@@ -44,7 +52,7 @@ GestionSemaforos crear_conjunto_semaforos(key_t clave, int num_semaforos)
     }
 
     //si ya existe, unirse al conjunto existente
-    if(errno = EEXIST)
+    if(errno == EEXIST)
     {
         gs.sem_id = semget(clave, num_semaforos, PERMISOS_SEM);
         if(gs.sem_id != -1)
@@ -54,7 +62,7 @@ GestionSemaforos crear_conjunto_semaforos(key_t clave, int num_semaforos)
     }
 
     perror("Error al crear/obtener conjunto de semaforos");
-    gs.sem_id = -1'
+    gs.sem_id = -1;
     return gs;
 }
 
@@ -90,7 +98,7 @@ bool tomar_semaforo(GestionSemaforos *gs, int num_semaforo, int timeout_ms)
         .sem_flg = 0
     };
 
-    if(semop_timeout(gs->sem_id, &op, 1, timeout_ms), == -1)
+    if(semop_timeout(gs->sem_id, &op, 1, timeout_ms) == -1)
     {
         if(errno == EAGAIN)
         {
@@ -140,9 +148,25 @@ void eliminar_conjunto_semaforos(GestionSemaforos *gs)
     {
         if(semctl(gs->sem_id, 0, IPC_RMID) == -1)
         {
-            perror("Advertencia: Error al eliminar conjunto de semaforos\n");
+            perror("Advertencia: Error al eliminar conjunto de semaforos");
         }
     }
     gs->sem_id = -1;
     gs->creado = false;
+}
+
+int obtener_valor_semaforo(GestionSemaforos *gs, int num_semaforo)
+{
+    if (!gs || gs->sem_id == -1 || num_semaforo < 0 || num_semaforo >= gs->num_semaforos)
+    {
+        fprintf(stderr, "Parámetros inválidos para obtener valor de semáforo\n");
+        return -1;
+    }
+
+    int val = semctl(gs->sem_id, num_semaforo, GETVAL);
+    if (val == -1)
+    {
+        perror("Error al obtener valor del semáforo");
+    }
+    return val;
 }
