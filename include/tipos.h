@@ -140,7 +140,8 @@ typedef enum
 {
     RIESGO_BAJO = 0,
     RIESGO_MEDIO = 1,
-    RIESGO_ALTO = 3
+    RIESGO_ALTO = 3,
+    RIESGO_CRITICO = 4
 }NivelRiesgo;
 
 typedef enum
