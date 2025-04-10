@@ -1,5 +1,6 @@
 #include "memoria_compartida.h"
 #include "semaforos.h"
+#include "modulo_aprendizaje.h"
 #include "interfaces.h"
 #include <stdio.h>
 #include <string.h>
@@ -22,13 +23,14 @@ int main()
     }
 
     // Simulación de una llamada pendiente
-    int i = gm.ptr_memoria->contador_llamadas++;
+    /*int i = gm.ptr_memoria->contador_llamadas++;
     gm.ptr_memoria->llamadas[i].id = 1;
     gm.ptr_memoria->llamadas[i].tipo = LLAMADA_POLICIAL;
     gm.ptr_memoria->llamadas[i].tipo_terreno = TERRENO_URBANO;
     gm.ptr_memoria->llamadas[i].estado = LLAMADA_PENDIENTE;
     gm.ptr_memoria->llamadas[i].zona.codigo = 101;
-    gm.ptr_memoria->llamadas[i].tiempos.creacion = time(NULL);
+    gm.ptr_memoria->llamadas[i].tiempos.creacion = time(NULL);*/
+    printf("[INFO] Solo se registrara unidad, no se generara llamada aqui.\n");
 
     // Simulación de una unidad disponible
     int u = gm.ptr_memoria->contador_unidades++;

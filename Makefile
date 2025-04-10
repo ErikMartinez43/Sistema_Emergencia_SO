@@ -8,51 +8,41 @@ INCLUDE_DIR := include
 BUILD_DIR := build
 BIN_DIR := bin
 
-# Todos los .cpp en src/
-ALL_CPP := $(shell find $(SRC_DIR) -type f -name "*.cpp")
+# Archivos fuente base (infraestructura y aprendizaje)
+BASE_CPP := $(shell find $(SRC_DIR)/infraestructura $(SRC_DIR)/aprendizaje -name "*.cpp")
+BASE_OBJS := $(patsubst $(SRC_DIR)/%.cpp, $(BUILD_DIR)/%.o, $(BASE_CPP))
 
-# Todos los .cpp que deben generar binarios (no forman parte del sistema base)
-ENTRY_POINTS := $(filter-out $(SRC_DIR)/infraestructura/% $(SRC_DIR)/aprendizaje/%, $(ALL_CPP))
-ENTRY_NAMES := $(basename $(notdir $(ENTRY_POINTS)))
-ENTRY_OBJS := $(patsubst %,$(BUILD_DIR)/%.o,$(ENTRY_NAMES))
-ENTRY_BINS := $(patsubst %,$(BIN_DIR)/%,$(ENTRY_NAMES))
+# Ejecutables (todo lo demás)
+EXEC_CPP := $(shell find $(SRC_DIR) -type f -name "*.cpp" ! -path "$(SRC_DIR)/infraestructura/*" ! -path "$(SRC_DIR)/aprendizaje/*")
+EXEC_NAMES := $(basename $(notdir $(EXEC_CPP)))
+EXEC_BINS := $(patsubst %, $(BIN_DIR)/%, $(EXEC_NAMES))
+EXEC_OBJS := $(patsubst %, $(BUILD_DIR)/%.o, $(EXEC_NAMES))
 
-# Archivos fuente del sistema (infraestructura, aprendizaje)
-SYSTEM_CPP := $(filter-out $(ENTRY_POINTS),$(ALL_CPP))
-SYSTEM_OBJS := $(patsubst $(SRC_DIR)/%.cpp,$(BUILD_DIR)/%.o,$(SYSTEM_CPP))
+# ───── REGLAS PRINCIPALES ─────
 
-# ───── COMPILACIÓN ─────
+all: $(EXEC_BINS)
 
-all: $(ENTRY_BINS)
-
-$(BIN_DIR)/%: $(BUILD_DIR)/%.o $(SYSTEM_OBJS)
+# Ejecutables
+$(BIN_DIR)/%: $(BUILD_DIR)/%.o $(BASE_OBJS)
 	@mkdir -p $(BIN_DIR)
 	$(CXX) $(CXXFLAGS) -o $@ $^
 
-$(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp
+# Objetos individuales
+$(BUILD_DIR)/%.o: 
 	@mkdir -p $(dir $@)
-	$(CXX) $(CXXFLAGS) -I$(INCLUDE_DIR) -c $< -o $@
+	@src_file=$(shell find $(SRC_DIR) -type f -name $*.cpp); \
+	if [ -z "$$src_file" ]; then \
+		echo "❌ Archivo fuente '$*.cpp' no encontrado en $(SRC_DIR)"; \
+		exit 1; \
+	fi; \
+	$(CXX) $(CXXFLAGS) -I$(INCLUDE_DIR) -c $$src_file -o $@
 
-# Alias: permitir make generador
-.PHONY: $(ENTRY_NAMES)
-$(ENTRY_NAMES): %: $(BIN_DIR)/%
-	@echo "Compilado → bin/$@"
+# Alias: make test_funcionamiento, generador, etc.
+.PHONY: $(EXEC_NAMES)
+$(EXEC_NAMES): %: $(BIN_DIR)/%
+	@echo "✅ Compilado: bin/$@"
 
-#Ejecutable para generador.cpp
-bin/generador: build/generador.o $(SYSTEM_OBJS)
-	@mkdir -p bin
-	$(CXX) $(CXXFLAGS) -o $@ $^
-
-#objeto de generador.cpp
-build/generador.o: src/generador_llamadas/generador.cpp
-	@mkdir -p build
-	$(CXX) $(CXXFLAGS) -Iinclude -c $< -o $@
-
-#Alias
-.PHONY: generador
-generador: bin/generador
-
-# ───── LIMPIEZA ─────
-
+# Limpieza
 clean:
 	rm -rf $(BUILD_DIR) $(BIN_DIR)
+
