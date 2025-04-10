@@ -1,43 +1,39 @@
-# Compilador y flags
+# Compilador y opciones
 CXX = g++
 CXXFLAGS = -Wall -Wextra -std=c++17 -g
-
-# Directorios
-SRC_DIR = src
-TEST_DIR = src/test
-INFRA_DIR = src/infraestructura
-BUILD_DIR = build
 INCLUDE_DIR = include
+BUILD_DIR = build
+SRC_DIR = src
+INFRA_DIR = $(SRC_DIR)/infraestructura
+TEST_DIR = $(SRC_DIR)/test
 
-# Archivos fuente y objetos
-OBJS = \
-	$(BUILD_DIR)/memoria_compartida.o \
-	$(BUILD_DIR)/semaforos.o \
-	$(BUILD_DIR)/test_sem_memo.o
+# Archivos fuente compartidos
+SHARED_SRCS = $(INFRA_DIR)/memoria_compartida.cpp $(INFRA_DIR)/semaforos.cpp $(INFRA_DIR)/interfaces.cpp
+SHARED_OBJS = $(patsubst $(INFRA_DIR)/%.cpp,$(BUILD_DIR)/%.o,$(SHARED_SRCS))
 
-# Ejecutable
-TARGET = test_sem_memo
+# Detectar automáticamente los archivos de prueba
+TEST_SRCS = $(wildcard $(TEST_DIR)/*.cpp)
+TEST_OBJS = $(patsubst $(TEST_DIR)/%.cpp,$(BUILD_DIR)/%.o,$(TEST_SRCS))
+TEST_BINS = $(patsubst $(TEST_DIR)/%.cpp,%,$(TEST_SRCS))
 
-# Regla por defecto
-all: $(TARGET)
+# Regla por defecto: compilar todos los binarios de prueba
+all: $(TEST_BINS)
 
-# Vinculación final
-$(TARGET): $(OBJS)
+# Regla general para compilar ejecutables de prueba
+%: $(BUILD_DIR)/%.o $(SHARED_OBJS)
 	$(CXX) $(CXXFLAGS) -o $@ $^
 
-# Compilación de objetos
-$(BUILD_DIR)/memoria_compartida.o: $(INFRA_DIR)/memoria_compartida.cpp $(INCLUDE_DIR)/memoria_compartida.h $(INCLUDE_DIR)/tipos.h
+# Compilar objetos de pruebas
+$(BUILD_DIR)/%.o: $(TEST_DIR)/%.cpp
 	$(CXX) $(CXXFLAGS) -I$(INCLUDE_DIR) -c $< -o $@
 
-$(BUILD_DIR)/semaforos.o: $(INFRA_DIR)/semaforos.cpp $(INCLUDE_DIR)/semaforos.h
+# Compilar objetos compartidos
+$(BUILD_DIR)/%.o: $(INFRA_DIR)/%.cpp
 	$(CXX) $(CXXFLAGS) -I$(INCLUDE_DIR) -c $< -o $@
 
-$(BUILD_DIR)/test_sem_memo.o: $(TEST_DIR)/test_sem_memo.cpp $(INCLUDE_DIR)/memoria_compartida.h $(INCLUDE_DIR)/semaforos.h
-	$(CXX) $(CXXFLAGS) -I$(INCLUDE_DIR) -c $< -o $@
-
-# Limpieza
-clean:
-	rm -f $(BUILD_DIR)/*.o $(TARGET)
-
-# Carpeta build si no existe
+# Crear la carpeta build si no existe
 $(shell mkdir -p $(BUILD_DIR))
+
+# Limpiar binarios y objetos
+clean:
+	rm -f $(BUILD_DIR)/*.o $(TEST_BINS)

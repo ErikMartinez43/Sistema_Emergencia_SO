@@ -39,6 +39,7 @@ Unidad *buscar_unidad_disponible(MemoriaCompartida *mem, TipoUnidad tipo)
 
 void asignar_unidad(Unidad *unidad, int llamada_id)
 {
+    (void)llamada_id;
     if(unidad)
     {
         unidad->estado = UNIDAD_OCUPADA;
@@ -79,7 +80,7 @@ const char *obtener_nombre_riesgo(NivelRiesgo nivel)
     case RIESGO_BAJO: return "Bajo";
     case RIESGO_MEDIO: return "Medio";
     case RIESGO_ALTO: return "Alto";
-    case RIESGO_CRITICO: return "Critico"
+    case RIESGO_CRITICO: return "Critico";
     default: return "Desconocido";
     }
 }
