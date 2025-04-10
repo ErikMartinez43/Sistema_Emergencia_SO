@@ -1,76 +1,70 @@
-#include "interfaces.h"
-#include <stdio.h>
+#include "modulo_aprendizaje.h"
 
-
-void aprendizaje_recomendar_respuesta(
-    MemoriaCompartida* mem,
-    int codigo_zona,
-    int tipo_llamada,
-    int* tipo_unidad,
-    int* tipo_vehiculo
- )
- {
-    if( !mem || !tipo_unidad || !tipo_vehiculo) return;
-
-    ZonaRiesgo* zona = obtener_codigo_zona(mem, codigo_zona);
-    if(zona == NULL)
+RegistroAprendizaje* buscar_historial(MemoriaCompartida* mem, int zona, TipoIncidente tipo)
+{
+    for (int i = 0; i < mem->contador_historial; ++i)
     {
-        *tipo_unidad = UNIDAD_PATRULLA;
-        *tipo_vehiculo = VEHICULO_PICKUP;
-        return;
+        if (mem->historial[i].zona.codigo == zona &&
+            mem->historial[i].tipo_incidente == tipo)
+        {
+            return &mem->historial[i];
+        }
+    }
+    return NULL;
+}
+
+void registrar_incidente(MemoriaCompartida* mem, int zona, TipoIncidente tipo, TipoTerreno terreno)
+{
+    RegistroAprendizaje* registro = buscar_historial(mem, zona, tipo);
+
+    if (registro)
+    {
+        registro->conteo++;
+        registro->ultimo_registro = time(NULL);
+    }
+    else if (mem->contador_historial < MAX_HISTORIAL)
+    {
+        int i = mem->contador_historial++;
+        mem->historial[i].zona.codigo = zona;
+        mem->historial[i].tipo_incidente = tipo;
+        mem->historial[i].tipo_terreno = terreno;
+        mem->historial[i].conteo = 1;
+        mem->historial[i].ultimo_registro = time(NULL);
+        mem->historial[i].timestamp = time(NULL);
+    }
+}
+
+NivelRiesgo calcular_peligrosidad(MemoriaCompartida* mem, int zona)
+{
+    int total = 0;
+
+    for (int i = 0; i < mem->contador_historial; ++i)
+    {
+        if (mem->historial[i].zona.codigo == zona)
+        {
+            total += mem->historial[i].conteo;
+        }
     }
 
-    switch (tipo_llamada)
-    {
-    case LLAMADA_MEDICA:
-        *tipo_unidad = UNIDAD_AMBULANCIA;
-        break;
-    case LLAMADA_POLICIAL:
-        *tipo_unidad = UNIDAD_PATRULLA;
-        break;
-    case LLAMADA_INCENDIO:
-        *tipo_unidad = UNIDAD_BOMBEROS;
-        break;
-    case LLAMADA_COMBINADA_MB:
-        *tipo_unidad = UNIDAD_AMBULANCIA; //DEBERA REALIZAR SOLICITUD DE REFUERZOS
-        break;
-    case LLAMADA_COMBINADA_MP:
-        *tipo_unidad = UNIDAD_AMBULANCIA;//protocolo de refuerzos
-        break;
-    case LLAMADA_COMBINADA_Pb:
-        *tipo_unidad = UNIDAD_PATRULLA; //SOLICITUD DE REFUERZOS
-        break;
-    case LLAMADA_TOTAL:
-        *tipo_unidad = UNIDAD_PATRULLA; //respuesta incial mixta
-        break;
-    default:
-        *tipo_unidad = UNIDAD_PATRULLA; //por defecto se enviara patrulla
-        break;
-    }
+    if (total > 20) return RIESGO_CRITICO;
+    if (total > 10) return RIESGO_ALTO;
+    if (total > 5) return RIESGO_MEDIO;
+    return RIESGO_BAJO;
+}
 
-    //TIPO DE VEHICULO SEGUN TERRENO
-    switch (zona->tipo_terreno)
-    {
-    case TERRENO_URBANO:
-        *tipo_vehiculo = VEHICULO_SEDAN;
-        break;
-    case TERRENO_RURAL:
-        *tipo_vehiculo = VEHICULO_PICKUP;
-        break;
-    case TERRENO_MONTANIOSO:
-        *tipo_vehiculo = VEHICULO_TODO_TERRENO;
-        break;
-    case TERRENO_CONGESTIONADO:
-        *tipo_vehiculo = VEHICULO_MOTO;
-        break;
-    default:
-        *tipo_vehiculo = VEHICULO_SEDAN;
-        break;
-    }
+int evaluar_falsa_alarma(MemoriaCompartida* mem, int zona, TipoIncidente tipo)
+{
+    RegistroAprendizaje* registro = buscar_historial(mem, zona, tipo);
 
-    if(zona->nivel_riesgo == RIESGO_ALTO && tipo_vehiculo == VEHICULO_SEDAN)
-    {
-        *tipo_vehiculo = VEHICULO_PICKUP;
-    }
+    if (!registro)
+        return 1; // no hay historial, sospechosa
 
- }
+    time_t ahora = time(NULL);
+    double segundos = difftime(ahora, registro->ultimo_registro);
+
+    // Si ha pasado mucho tiempo desde el último incidente y solo hubo uno, puede ser falsa
+    if (registro->conteo == 1 && segundos > 3600 * 24 * 30) // más de 30 días
+        return 1;
+
+    return 0;
+}

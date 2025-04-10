@@ -1,39 +1,50 @@
-# Compilador y opciones
+# ─────────────── CONFIGURACIÓN ───────────────
+
 CXX = g++
 CXXFLAGS = -Wall -Wextra -std=c++17 -g
-INCLUDE_DIR = include
-BUILD_DIR = build
-SRC_DIR = src
-INFRA_DIR = $(SRC_DIR)/infraestructura
-TEST_DIR = $(SRC_DIR)/test
 
-# Archivos fuente compartidos
-SHARED_SRCS = $(INFRA_DIR)/memoria_compartida.cpp $(INFRA_DIR)/semaforos.cpp $(INFRA_DIR)/interfaces.cpp
-SHARED_OBJS = $(patsubst $(INFRA_DIR)/%.cpp,$(BUILD_DIR)/%.o,$(SHARED_SRCS))
+SRC_DIR := src
+INCLUDE_DIR := include
+BUILD_DIR := build
+BIN_DIR := bin
 
-# Detectar automáticamente los archivos de prueba
-TEST_SRCS = $(wildcard $(TEST_DIR)/*.cpp)
-TEST_OBJS = $(patsubst $(TEST_DIR)/%.cpp,$(BUILD_DIR)/%.o,$(TEST_SRCS))
-TEST_BINS = $(patsubst $(TEST_DIR)/%.cpp,%,$(TEST_SRCS))
+# Archivos fuente normales y de prueba
+SRC_FILES := $(shell find $(SRC_DIR) -type f -name "*.cpp" ! -path "$(SRC_DIR)/test/*")
+TEST_FILES := $(wildcard $(SRC_DIR)/test/*.cpp)
 
-# Regla por defecto: compilar todos los binarios de prueba
+# Objetos para fuentes normales
+SRC_OBJS := $(patsubst $(SRC_DIR)/%.cpp,$(BUILD_DIR)/%.o,$(SRC_FILES))
+
+# Nombres de los tests (sin extensión ni ruta)
+TEST_NAMES := $(basename $(notdir $(TEST_FILES)))
+TEST_OBJS := $(patsubst %,$(BUILD_DIR)/%.o,$(TEST_NAMES))
+TEST_BINS := $(patsubst %,$(BIN_DIR)/%,$(TEST_NAMES))
+
+# ─────────────── COMPILACIÓN ───────────────
+
 all: $(TEST_BINS)
 
-# Regla general para compilar ejecutables de prueba
-%: $(BUILD_DIR)/%.o $(SHARED_OBJS)
+# Ejecutables → bin/nombre
+$(BIN_DIR)/%: $(BUILD_DIR)/%.o $(SRC_OBJS)
+	@mkdir -p $(BIN_DIR)
 	$(CXX) $(CXXFLAGS) -o $@ $^
 
-# Compilar objetos de pruebas
-$(BUILD_DIR)/%.o: $(TEST_DIR)/%.cpp
+# Objetos de test → build/nombre.o
+$(BUILD_DIR)/%.o: $(SRC_DIR)/test/%.cpp
+	@mkdir -p $(BUILD_DIR)
 	$(CXX) $(CXXFLAGS) -I$(INCLUDE_DIR) -c $< -o $@
 
-# Compilar objetos compartidos
-$(BUILD_DIR)/%.o: $(INFRA_DIR)/%.cpp
+# Objetos de fuentes normales
+$(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp
+	@mkdir -p $(dir $@)
 	$(CXX) $(CXXFLAGS) -I$(INCLUDE_DIR) -c $< -o $@
 
-# Crear la carpeta build si no existe
-$(shell mkdir -p $(BUILD_DIR))
+# Alias para permitir: make test_aprendizaje
+.PHONY: $(TEST_NAMES)
+$(TEST_NAMES): %: $(BIN_DIR)/%
+	@echo "Compilado → bin/$@"
 
-# Limpiar binarios y objetos
+# ─────────────── LIMPIEZA ───────────────
+
 clean:
-	rm -f $(BUILD_DIR)/*.o $(TEST_BINS)
+	rm -rf $(BUILD_DIR) $(BIN_DIR)

@@ -1,49 +1,29 @@
 #include "memoria_compartida.h"
 #include "modulo_aprendizaje.h"
 #include "interfaces.h"
-#include <iostream>
-#include <string.h>
+#include <stdio.h>
 
-using namespace std;
+int main()
+{
+    key_t clave = 0x5678;
+    GestionMemoria gm = crear_memoria_compartida(clave, sizeof(MemoriaCompartida));
 
-int main() {
-    // Crear memoria compartida
-    int shm_id = crear_clave_memoria(1234, sizeof(MemoriaCompartida));
-    if (shm_id == -1) {
-        perror("Error creando memoria");
-        return 1;
+    int codigo_zona = 101;
+    TipoIncidente tipo = INCIDENTE_POLICIAL;
+
+    printf("Registrando 7 incidentes en zona %d...\n", codigo_zona);
+    for (int i = 0; i < 7; ++i)
+    {
+        registrar_incidente(gm.ptr_memoria, codigo_zona, tipo, TERRENO_URBANO);
     }
 
-    // Obtener puntero a memoria
-    MemoriaCompartida* mem = (MemoriaCompartida*) obtener_memoria(shm_id);
-    if (mem == nullptr) {
-        perror("Error obteniendo memoria");
-        return 1;
-    }
+    NivelRiesgo riesgo = calcular_peligrosidad(gm.ptr_memoria, codigo_zona);
+    printf("Nivel de riesgo estimado: %s\n", obtener_nombre_riesgo(riesgo));
 
-    // Simular una zona de riesgo
-    ZonaRiesgo zona;
-    zona.codigo_zona = 78;
-    strcpy(zona.nombre, "Colonia El Pedregal");
-    zona.zona_general = ZONA_SUR;
-    zona.nivel_riesgo = RIESGO_ALTO;
-    zona.actividad_criminal = ACTIVIDAD_CRIMEN_ORGANIZADO;
-    zona.tipo_terreno = TERRENO_MONTANIOSO;
+    int falsa = evaluar_falsa_alarma(gm.ptr_memoria, codigo_zona, tipo);
+    printf("¿Posible falsa alarma?: %s\n", falsa ? "Sí" : "No");
 
-    // Insertarla en la memoria compartida
-    mem->zonas[0] = zona;
-
-    // Ejecutar el módulo de aprendizaje
-    int tipo_unidad = -1;
-    int tipo_vehiculo = -1;
-    aprendizaje_recomendar_respuesta(mem, 78, LLAMADA_COMBINADA_MB, &tipo_unidad, &tipo_vehiculo);
-
-    // Mostrar resultado
-    cout << "Zona: " << zona.nombre << endl;
-    cout << "Unidad sugerida: " << obtener_tipo_unidad(tipo_unidad) << endl;
-    cout << "Vehículo sugerido: " << tipo_vehiculo << endl;
-
-    // Limpiar memoria
-    eliminar_memoria(shm_id);
+    destruir_memoria_compartida(&gm);
     return 0;
 }
+
