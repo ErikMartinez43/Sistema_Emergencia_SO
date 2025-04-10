@@ -37,7 +37,7 @@ typedef enum
     INCIDENTE_COMBINADO = 3
 }TipoIncidente;
 
-//enum llamas
+//enum llamada
 typedef enum {
     LLAMADA_MEDICA = 0,
     LLAMADA_POLICIAL = 1,
