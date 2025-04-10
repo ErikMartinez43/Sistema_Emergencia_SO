@@ -1,4 +1,4 @@
-# ─────────────── CONFIGURACIÓN ───────────────
+# ───── CONFIGURACIÓN GENERAL ─────
 
 CXX = g++
 CXXFLAGS = -Wall -Wextra -std=c++17 -g
@@ -8,43 +8,51 @@ INCLUDE_DIR := include
 BUILD_DIR := build
 BIN_DIR := bin
 
-# Archivos fuente normales y de prueba
-SRC_FILES := $(shell find $(SRC_DIR) -type f -name "*.cpp" ! -path "$(SRC_DIR)/test/*")
-TEST_FILES := $(wildcard $(SRC_DIR)/test/*.cpp)
+# Todos los .cpp en src/
+ALL_CPP := $(shell find $(SRC_DIR) -type f -name "*.cpp")
 
-# Objetos para fuentes normales
-SRC_OBJS := $(patsubst $(SRC_DIR)/%.cpp,$(BUILD_DIR)/%.o,$(SRC_FILES))
+# Todos los .cpp que deben generar binarios (no forman parte del sistema base)
+ENTRY_POINTS := $(filter-out $(SRC_DIR)/infraestructura/% $(SRC_DIR)/aprendizaje/%, $(ALL_CPP))
+ENTRY_NAMES := $(basename $(notdir $(ENTRY_POINTS)))
+ENTRY_OBJS := $(patsubst %,$(BUILD_DIR)/%.o,$(ENTRY_NAMES))
+ENTRY_BINS := $(patsubst %,$(BIN_DIR)/%,$(ENTRY_NAMES))
 
-# Nombres de los tests (sin extensión ni ruta)
-TEST_NAMES := $(basename $(notdir $(TEST_FILES)))
-TEST_OBJS := $(patsubst %,$(BUILD_DIR)/%.o,$(TEST_NAMES))
-TEST_BINS := $(patsubst %,$(BIN_DIR)/%,$(TEST_NAMES))
+# Archivos fuente del sistema (infraestructura, aprendizaje)
+SYSTEM_CPP := $(filter-out $(ENTRY_POINTS),$(ALL_CPP))
+SYSTEM_OBJS := $(patsubst $(SRC_DIR)/%.cpp,$(BUILD_DIR)/%.o,$(SYSTEM_CPP))
 
-# ─────────────── COMPILACIÓN ───────────────
+# ───── COMPILACIÓN ─────
 
-all: $(TEST_BINS)
+all: $(ENTRY_BINS)
 
-# Ejecutables → bin/nombre
-$(BIN_DIR)/%: $(BUILD_DIR)/%.o $(SRC_OBJS)
+$(BIN_DIR)/%: $(BUILD_DIR)/%.o $(SYSTEM_OBJS)
 	@mkdir -p $(BIN_DIR)
 	$(CXX) $(CXXFLAGS) -o $@ $^
 
-# Objetos de test → build/nombre.o
-$(BUILD_DIR)/%.o: $(SRC_DIR)/test/%.cpp
-	@mkdir -p $(BUILD_DIR)
-	$(CXX) $(CXXFLAGS) -I$(INCLUDE_DIR) -c $< -o $@
-
-# Objetos de fuentes normales
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp
 	@mkdir -p $(dir $@)
 	$(CXX) $(CXXFLAGS) -I$(INCLUDE_DIR) -c $< -o $@
 
-# Alias para permitir: make test_aprendizaje
-.PHONY: $(TEST_NAMES)
-$(TEST_NAMES): %: $(BIN_DIR)/%
+# Alias: permitir make generador
+.PHONY: $(ENTRY_NAMES)
+$(ENTRY_NAMES): %: $(BIN_DIR)/%
 	@echo "Compilado → bin/$@"
 
-# ─────────────── LIMPIEZA ───────────────
+#Ejecutable para generador.cpp
+bin/generador: build/generador.o $(SYSTEM_OBJS)
+	@mkdir -p bin
+	$(CXX) $(CXXFLAGS) -o $@ $^
+
+#objeto de generador.cpp
+build/generador.o: src/generador_llamadas/generador.cpp
+	@mkdir -p build
+	$(CXX) $(CXXFLAGS) -Iinclude -c $< -o $@
+
+#Alias
+.PHONY: generador
+generador: bin/generador
+
+# ───── LIMPIEZA ─────
 
 clean:
 	rm -rf $(BUILD_DIR) $(BIN_DIR)
