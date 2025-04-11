@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <time.h>
+#include <cstdlib>
 
 #include "tipos.h"
 #include "memoria_compartida.h"

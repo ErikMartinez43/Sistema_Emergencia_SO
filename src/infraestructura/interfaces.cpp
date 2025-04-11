@@ -1,5 +1,6 @@
 #include "interfaces.h"
 #include <string.h>
+#include <cstdio>
 
 //====== FUNCIONES SOBRE LLAMADAS =======
 
@@ -136,4 +137,52 @@ const char *obtener_gravedad(GravedadPaciente gravedad)
         case GRAVEDAD_GRAVE: return "Grave";
         default: return "Desconocida";
     } 
+}
+
+void eliminar_llamada_finalizada(MemoriaCompartida* mem, int id_llamada)
+{
+    bool encontrada = false;
+
+    for (int i = 0; i < mem->contador_llamadas; ++i)
+    {
+        if (mem->llamadas[i].id == id_llamada && mem->llamadas[i].estado == LLAMADA_FINALIZADA)
+        {
+            encontrada = true;
+            // Mover las demás llamadas para ocupar el espacio vacío
+            for (int j = i; j < mem->contador_llamadas - 1; ++j)
+            {
+                mem->llamadas[j] = mem->llamadas[j + 1];
+            }
+            mem->contador_llamadas--;  // Reducir el contador de llamadas activas
+            printf("[INFO] Llamada %d eliminada correctamente de la memoria.\n", id_llamada);
+            break;
+        }
+    }
+
+    if (!encontrada)
+    {
+         fprintf(stderr, "[ADVERTENCIA] No se encontró llamada %d para eliminar.\n", id_llamada);
+    }
+}
+
+void limpiar_llamadas_finalizadas(MemoriaCompartida *mem)
+{
+    if(!mem) return;
+
+    int nueva_pos = 0;
+    for(int i =0; i < mem->contador_llamadas; ++i)
+    {
+        //copiar a nueva posicion si no esta finalizada
+        if(mem->llamadas[i].estado != LLAMADA_FINALIZADA)
+        {
+            //copiar a nueva posicion si no esta finalizada
+            if(i != nueva_pos)
+            {
+                mem->llamadas[nueva_pos] = mem->llamadas[i];
+            }
+            nueva_pos++;
+        }
+    }
+
+    mem->contador_llamadas = nueva_pos;
 }

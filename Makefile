@@ -1,48 +1,63 @@
-# ───── CONFIGURACIÓN GENERAL ─────
-
+# ─── CONFIGURACIÓN GENERAL ───
 CXX = g++
 CXXFLAGS = -Wall -Wextra -std=c++17 -g
 
 SRC_DIR := src
-INCLUDE_DIR := include
 BUILD_DIR := build
 BIN_DIR := bin
+INCLUDE_DIR := include
 
-# Archivos fuente base (infraestructura y aprendizaje)
-BASE_CPP := $(shell find $(SRC_DIR)/infraestructura $(SRC_DIR)/aprendizaje -name "*.cpp")
-BASE_OBJS := $(patsubst $(SRC_DIR)/%.cpp, $(BUILD_DIR)/%.o, $(BASE_CPP))
+# Crear directorios automáticamente
+$(shell mkdir -p $(BUILD_DIR) $(BIN_DIR))
 
-# Ejecutables (todo lo demás)
-EXEC_CPP := $(shell find $(SRC_DIR) -type f -name "*.cpp" ! -path "$(SRC_DIR)/infraestructura/*" ! -path "$(SRC_DIR)/aprendizaje/*")
-EXEC_NAMES := $(basename $(notdir $(EXEC_CPP)))
-EXEC_BINS := $(patsubst %, $(BIN_DIR)/%, $(EXEC_NAMES))
-EXEC_OBJS := $(patsubst %, $(BUILD_DIR)/%.o, $(EXEC_NAMES))
+# ─── ARCHIVOS FUENTE BASE (compartidos) ───
+BASE_SRCS := \
+    $(SRC_DIR)/infraestructura/memoria_compartida.cpp \
+    $(SRC_DIR)/infraestructura/semaforos.cpp \
+    $(SRC_DIR)/infraestructura/interfaces.cpp \
+    $(SRC_DIR)/infraestructura/gestor_jornadas.cpp \
+    $(SRC_DIR)/aprendizaje/modulo_aprendizaje.cpp
 
-# ───── REGLAS PRINCIPALES ─────
+BASE_OBJS := $(patsubst $(SRC_DIR)/%.cpp,$(BUILD_DIR)/%.o,$(BASE_SRCS))
 
-all: $(EXEC_BINS)
+# ─── BINARIOS A COMPILAR ───
+BINARIOS := generador comisaria subestacion patrulla hospital ambulancia bomberos vehiculos_bomberos main
 
-# Ejecutables
+# Reglas de compilación de binarios
+all: $(BINARIOS)
+
+# Compilar ejecutables finales
+$(BINARIOS): %: $(BIN_DIR)/%
+	@echo "✅ Compilado: $(BIN_DIR)/$@"
+
 $(BIN_DIR)/%: $(BUILD_DIR)/%.o $(BASE_OBJS)
-	@mkdir -p $(BIN_DIR)
 	$(CXX) $(CXXFLAGS) -o $@ $^
 
-# Objetos individuales
-$(BUILD_DIR)/%.o: 
+# ─── OBJETOS PARA BINARIOS ───
+
+# main.cpp
+$(BUILD_DIR)/main.o: main.cpp
+	$(CXX) $(CXXFLAGS) -I$(INCLUDE_DIR) -c $< -o $@
+
+# generador (caso especial, ubicación diferente)
+$(BUILD_DIR)/generador.o: $(SRC_DIR)/generador_llamadas/generador.cpp
+	$(CXX) $(CXXFLAGS) -I$(INCLUDE_DIR) -c $< -o $@
+
+# objetos para unidades
+$(BUILD_DIR)/%.o: $(SRC_DIR)/unidades/%.cpp
+	$(CXX) $(CXXFLAGS) -I$(INCLUDE_DIR) -c $< -o $@
+
+# objetos para infraestructura y aprendizaje
+$(BUILD_DIR)/infraestructura/%.o: $(SRC_DIR)/infraestructura/%.cpp
 	@mkdir -p $(dir $@)
-	@src_file=$(shell find $(SRC_DIR) -type f -name $*.cpp); \
-	if [ -z "$$src_file" ]; then \
-		echo "❌ Archivo fuente '$*.cpp' no encontrado en $(SRC_DIR)"; \
-		exit 1; \
-	fi; \
-	$(CXX) $(CXXFLAGS) -I$(INCLUDE_DIR) -c $$src_file -o $@
+	$(CXX) $(CXXFLAGS) -I$(INCLUDE_DIR) -c $< -o $@
 
-# Alias: make test_funcionamiento, generador, etc.
-.PHONY: $(EXEC_NAMES)
-$(EXEC_NAMES): %: $(BIN_DIR)/%
-	@echo "✅ Compilado: bin/$@"
+$(BUILD_DIR)/aprendizaje/%.o: $(SRC_DIR)/aprendizaje/%.cpp
+	@mkdir -p $(dir $@)
+	$(CXX) $(CXXFLAGS) -I$(INCLUDE_DIR) -c $< -o $@
 
-# Limpieza
+# ─── LIMPIEZA ───
 clean:
 	rm -rf $(BUILD_DIR) $(BIN_DIR)
 
+.PHONY: all clean $(BINARIOS)

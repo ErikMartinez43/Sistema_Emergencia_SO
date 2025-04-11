@@ -80,4 +80,8 @@ const char* obtener_tipo_unidad(TipoUnidad tipo_unidad);
  */
 const char* obtener_gravedad(GravedadPaciente gravedad);
 
+void eliminar_llamada_finalizada(MemoriaCompartida* mem, int id_llamada);
+
+void limpiar_llamadas_finalizadas(MemoriaCompartida* mem);
+
 #endif //INTERFACES_H

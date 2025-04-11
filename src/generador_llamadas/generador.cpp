@@ -50,6 +50,7 @@ bool inicializar_entorno()
    return true;
 }
 
+
 Llamada generar_llamada(int id)
 {
     Llamada nueva;
@@ -114,7 +115,9 @@ int main()
     srand(time(NULL));
 
     for(int i = 0; i < 10; ++i)
-    {   
+    {   //haciendo espacio en memoria para llamadas pendientes
+        limpiar_llamadas_finalizadas(memoria.ptr_memoria);
+
         printf("[DEBUG] Generando llamada %d...\n", i + 1);
         Llamada llamada = generar_llamada(i + 1);
         if(registrar_llamada(llamada))

@@ -57,9 +57,6 @@ void atender_llamadas_policiales()
                 l->estado = LLAMADA_EN_ATENCION;
                 l->tiempos.asignacion = time(NULL);
 
-                // Derivar a subestación (simulado por ahora)
-                // → Aquí se podría usar fork para crear un proceso hijo
-
                 break; // solo procesamos una a la vez
             }
         }

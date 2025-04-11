@@ -22,30 +22,32 @@ int main()
         }
     }
 
-    // Simulación de una llamada pendiente
-    /*int i = gm.ptr_memoria->contador_llamadas++;
+    // Simulación de una llamada policial
+    int i = gm.ptr_memoria->contador_llamadas++;
     gm.ptr_memoria->llamadas[i].id = 1;
-    gm.ptr_memoria->llamadas[i].tipo = LLAMADA_POLICIAL;
+    gm.ptr_memoria->llamadas[i].tipo = LLAMADA_POLICIAL;  // Llamada tipo policial
     gm.ptr_memoria->llamadas[i].tipo_terreno = TERRENO_URBANO;
     gm.ptr_memoria->llamadas[i].estado = LLAMADA_PENDIENTE;
     gm.ptr_memoria->llamadas[i].zona.codigo = 101;
-    gm.ptr_memoria->llamadas[i].tiempos.creacion = time(NULL);*/
-    printf("[INFO] Solo se registrara unidad, no se generara llamada aqui.\n");
+    gm.ptr_memoria->llamadas[i].tiempos.creacion = time(NULL);
 
-    // Simulación de una unidad disponible
-    int u = gm.ptr_memoria->contador_unidades++;
-    gm.ptr_memoria->unidades[u].id = 10;
-    gm.ptr_memoria->unidades[u].tipo = UNIDAD_PATRULLA;
-    gm.ptr_memoria->unidades[u].estado = UNIDAD_DISPONIBLE;
-    gm.ptr_memoria->unidades[u].zona.codigo = 101;
-    gm.ptr_memoria->unidades[u].tipo_terreno = TERRENO_URBANO;
+    printf("[INFO] Llamada %d generada. Tipo: %d\n", gm.ptr_memoria->llamadas[i].id, gm.ptr_memoria->llamadas[i].tipo);
 
-    // Búsqueda de llamada y unidad disponibles
+    // Simulación de una patrulla disponible
+    int u1 = gm.ptr_memoria->contador_unidades++;
+    gm.ptr_memoria->unidades[u1].id = 1;  // ID único para la patrulla
+    gm.ptr_memoria->unidades[u1].tipo = UNIDAD_PATRULLA;
+    gm.ptr_memoria->unidades[u1].estado = UNIDAD_DISPONIBLE;
+    gm.ptr_memoria->unidades[u1].zona.codigo = 101;
+    gm.ptr_memoria->unidades[u1].tipo_terreno = TERRENO_URBANO;
+
+    // Búsqueda de llamada y patrulla disponibles
     Llamada* llamada = obtener_llamada_disponible(gm.ptr_memoria);
-    Unidad* unidad = buscar_unidad_disponible(gm.ptr_memoria, UNIDAD_PATRULLA);
+    Unidad* unidad = buscar_unidad_disponible(gm.ptr_memoria, UNIDAD_PATRULLA);  // Buscando una patrulla
 
     if (llamada && unidad)
     {
+        printf("[INFO] Asignando unidad %d a llamada %d\n", unidad->id, llamada->id);
         asignar_unidad(unidad, llamada->id);
         llamada->estado = LLAMADA_EN_ATENCION;
     }
